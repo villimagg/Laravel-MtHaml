@@ -1,7 +1,6 @@
 {
 	"require": {
-		"laravel/framework": "4.0.*",
-		"cartalyst/sentry": "2.0.*@dev"
+		"laravel/framework": "4.0.*"
 	},
 	"autoload": {
 		"classmap": [

@@ -21,7 +21,7 @@ class LaravelMthamlServiceProvider extends ServiceProvider {
 	
 	public function boot()
 	{
-	    
+	    $this->package('villimagg/laravel-mthaml');
 	}
 	
 	/**
