@@ -5,8 +5,9 @@
  */
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Foundation\Application;
 use Villimagg\LaravelMtHaml\Lexer;
+use Illuminate\Foundation\Application;
+use Illuminate\View\Engines\CompilerEngine;
 use MtHaml\Environment;
 use MtHaml\Support\Twig\Extension;
 
@@ -19,11 +20,6 @@ class LaravelMthamlServiceProvider extends ServiceProvider {
 	 */
 	protected $defer = false;
 	
-	public function boot()
-	{
-	    $this->package('villimagg/laravel-mthaml');
-	}
-	
 	/**
 	 * Register the service provider.
 	 *
@@ -32,9 +28,7 @@ class LaravelMthamlServiceProvider extends ServiceProvider {
 	public function register()
 	{
 		$this->app['mthaml'] = $this->app->share(function ($app) {
-            return new Environment('twig', array(
-                'enable_escaper' => false,
-            ));
+            return new Environment('php');
         });
 
         $this->app['mthaml.twig.extension'] = $this->app->share(function ($app) {
@@ -48,6 +42,26 @@ class LaravelMthamlServiceProvider extends ServiceProvider {
         //     $twig->setLexer($lexer);
         //     return $twig;
         // }));
+	}
+	
+	public function boot()
+	{
+		$app = $this->app;
+
+		$app['view.engine.resolver']->register('mthaml', function() use ($app)
+		// $app['view.engine.resolver']->register('twig', function() use ($app)
+		{
+			$cache = $app['path.storage'].'/views';
+
+			$compiler = new HamlCompiler($app['files'], $cache);
+			// $compiler->setEnvironment($app['twig']);
+			$compiler->setEnvironment($app['mthaml']);
+
+			return new CompilerEngine($compiler, $app['files']);
+		});
+
+		$app['view']->addExtension('haml.php', 'mthaml');
+		// $app['view']->addExtension('twig.haml', 'twig');
 	}
 
 	/**

@@ -13,5 +13,8 @@
 
 Route::get('/', function()
 {
-	return View::make('hello');
+    $fruit = array(
+        'banana','apple','orange','kiwi','grapes'
+    );
+	return View::make('hello', compact('fruit'));
 });
