@@ -101,6 +101,7 @@ return array(
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 		
 		// third party
+		'Villimagg\LaravelMthaml\TwigServiceProvider',
 		'Villimagg\LaravelMthaml\LaravelMthamlServiceProvider'
 	),
 

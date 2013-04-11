@@ -28,16 +28,18 @@ class LaravelMthamlServiceProvider extends ServiceProvider {
 	public function register()
 	{
 		$this->app['mthaml'] = $this->app->share(function ($app) {
-            return new Environment('php');
+            return new Environment('twig', array(
+                'enable_escaper' => false,
+            ));
         });
 
-        $this->app['mthaml.twig.extension'] = $this->app->share(function ($app) {
-            return new Extension();
-        });
+        // $this->app['mthaml.twig.extension'] = $this->app->share(function ($app) {
+        //     return new Extension();
+        // });
         
         // This gives me error:
-        // $this->app['twig'] = $this->app->share($this->app->extend('twig', function ($twig, $app) {
-        //     $twig->addExtension($app['mthaml.twig.extension']);
+        // $this->app['twig'] = $this->app->share($app->extend('twig', function ($twig, $app) {
+        //     // $twig->addExtension($app['mthaml.twig.extension']);
         //     $lexer = new Lexer($app['mthaml'], $twig->getLexer());
         //     $twig->setLexer($lexer);
         //     return $twig;
@@ -59,9 +61,21 @@ class LaravelMthamlServiceProvider extends ServiceProvider {
 
 			return new CompilerEngine($compiler, $app['files']);
 		});
+		
+		$app['view.engine.resolver']->register('twig', function() use ($app)
+		// $app['view.engine.resolver']->register('twig', function() use ($app)
+		{
+			$cache = $app['path.storage'].'/views';
 
-		$app['view']->addExtension('haml.php', 'mthaml');
-		// $app['view']->addExtension('twig.haml', 'twig');
+			$compiler = new HamlCompiler($app['files'], $cache);
+			// $compiler->setEnvironment($app['twig']);
+			$compiler->setEnvironment($app['mthaml']);
+
+			return new CompilerEngine($compiler, $app['files']);
+		});
+
+		// $app['view']->addExtension('haml.php', 'mthaml');
+		$app['view']->addExtension('twig.haml', 'twig');
 	}
 
 	/**
